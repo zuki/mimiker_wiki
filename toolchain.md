@@ -1,50 +1,56 @@
-Toolchain
+ツールチェーン
 ---
 
-To build and run Mimiker you will need a toolchain, i.e. compiler, linker, ELF
-tools, emulator and debugger. The default option is to choose quite recent
-_LLVM toolchain_ (check version in [tools.mk][6]), i.e. `clang`, `lld`, `llvm`
-from [apt.llvm.org][7] and [QEmu][11].
+Mimikerをビルド・実行するには、コンパイラ、リンカ、ELFツール、エミュレータ、
+デバッガなどのツールチェーンが必要です。デフォルトのオプションは最新の
+_LLVMツールチェーン_ （[tools.mk][6]でバージョンをチェック）、すなわち、
+[apt.llvm.org][7]が提供している`clang`, `lld`, `llvm`と[QEMU][11]です。
 
-NOTE:
-If you plan to run Mimiker on MIPS you need to install patched version of QEmu
-as well. Our version solves several issues not patched in the mainstream version
-– please refer to our list of [patches][10]. Prebuild package for Debian x86-64
-can be found [here][5].
+注意:
 
-## Requiremnts
-You can find all needed software in a [Dockerfile][12]. There is also a script
-[install-tools.sh][13] that will automatically install all needed software on
-Debian system.
+MimikerをMIPSで実行する場合はパッチを当てたバージョンのQEMUもインストール
+する必要があります。このバージョンはメインストリームバージョンでは修正されて
+いないいくつかの問題を解決しています。[patches][10]リストを参照してください。
+Debian x86-64用のプリビルドパッケージは[ここ][5]にあります。
 
-You also need to install python requirements. E.g. with command:
+## 必要なソフトウェア
+
+必要なソフトウェアは[Dockerfile][12]に書かれています。また、Debianシステムに
+必要なすべてのソフトウェアを自動的にインストールするスクリプト
+[install-tools.sh][13]もあります。
+
+pythonのモジュールもインストールする必要があります。次のコマンドでインストール
+できます。
+
 ```
 pip3 install -r requirements.txt
 ```
 
-#### A comment about dependencies from Dockerfile
+#### Dockerfileにある依存関係についてのコメント
+
 ```
-# patch & quilt required by lua and programs in contrib/
-# gperf required by libterminfo
-# socat & tmux required by launch
+# patchとquiltは、luaとcontrib/gperfの
+# プログラムでで必要です。
+# launchとtmuxはLauchで必要です。
 ```
 
-## Deprecated toolchain
-The other method is to use a custom pre-build _GNU toolchain_, i.e. `gcc`,
-`binutils` and `gdb`. We prepared packages for Debian x86-64 based system, each
-for different target architecture: supports [MIPS][1], [AArch64][2],
-RISC-V [32-bit][3] and [64-bit][4].
+## 非推奨ツールチェーン
+
+もう1つの方法はカスタムビルドされた _GNUツールチェーン_、すなわち、
+`gcc`, `binutils`, `gdb`を使う方法です。Debian x86-64ベースのシステム用に
+[MIPS][1], [AArch64][2], RISC-Vの[32-bit][3]と[64-bit][4]に対応した
+パッケージを用意しました。
 
 [1]: http://mimiker.ii.uni.wroc.pl/download/mipsel-mimiker-elf_latest_amd64.deb
 [2]: http://mimiker.ii.uni.wroc.pl/download/aarch64-mimiker-elf_latest_amd64.deb
 [3]: http://mimiker.ii.uni.wroc.pl/download/riscv32-mimiker-elf_latest_amd64.deb
 [4]: http://mimiker.ii.uni.wroc.pl/download/riscv64-mimiker-elf_latest_amd64.deb
 [5]: http://mimiker.ii.uni.wroc.pl/download/qemu-mimiker_latest_amd64.deb
-[6]: ../blob/master/build/tools.mk
+[6]: ../../mimiker/build/tools.mk
 [7]: https://apt.llvm.org/
 [8]: https://packages.debian.org/sid/gdb-multiarch
-[9]: ../blob/master/launch
-[10]: ../blob/master/toolchain/qemu-mimiker/patches
+[9]: ../../mimiker/launch
+[10]: ../../mimiker/toolchain/qemu-mimiker/patches
 [11]: https://www.qemu.org/
 [12]: ../blob/master/Dockerfile
 [14]: ../blob/master/install-tools.sh

@@ -1,45 +1,46 @@
-Running
+実行
 ---
 
-We provide a Python script, i.e. [launch][3], that simplifies running Mimiker OS.
-The kernel image is run with QEMU or Renode simulator. One or more serial
-consoles are available for interaction. Optionally you can attach to simulator
-with `gdb` debugger.  All of that is achieved by running all interactive
-sessions within [tmux][1] terminal multiplexer with default key bindings.
+Mimiker OSを簡単に起動するためのPythonスクリプト[launch][3]を提供しています。
+カーネルイメージはQEMUまたはRenodeシミュレータで実行されます。1つ以上のシリアル
+コンソールが対話のために用意されています。オプションで`gdb`デバッガを使って
+シミュレータにアタッチすることもできます。すべての対話型セッションはデフォルトの
+キーバインディングで[tmux][1]端末マルチプレクサ内で実行されます。
 
-To start kernel in test-run mode, run the following command in project's root
-directory. To finish simulation simply detach from `tmux` session by
-pressing `Ctrl+b` and `d` (as in _detach_) keys. To switch between emulated
-serial consoles and debugger press `Ctrl+b` and corresponding terminal number.
+カーネルをテストランモードで起動するには、プロジェクトのルートディレクトリで
+次のコマンドを実行します。シミュレーションを終了するには、`Ctrl+b`キーと`d`
+（_detach_の意味）キーを押して`tmux`セッションから切り離します。エミュレート
+されたシリアルコンソールとデバッガを切り替えるには`Ctrl+b`と対応するターミナル
+番号を押してください。
 
 ```
 ./launch test=all
 ```
 
-Some useful flags to the `launch` script:
+`lauch`スクリプトには便利なフラグがあります。
 
-* `-h` - Prints usage.
-* `-d` - Starts simulation under a debugger.
-* `-b` - To specify emulated board (if different than Raspberry Pi 3).
-* `-g` - Opens a window with graphics display, if the platform supports it.
+* `-h` - 使用状況を表示します。
+* `-d` - デバッガ配下でシミュレーションを開始します。
+* `-b` - エミュレートするボードを指定します（Raspberry Pi 3ではない場合）。
+* `-g` - プラットフォームがサポートしている場合、グラフィック表示のウィンドウを開きます。
 
-Any other argument is passed to the kernel as a kernel command-line
-argument. Some useful kernel arguments:
+その他の引数はカーネルのコマンドライン引数としてカーネルに渡されます。
+有用なカーネル引数には以下があります。
 
-* `init=PROGRAM` - Specifies the userspace program for PID 1.
-  Browse `bin` and `usr.bin` directories for currently available programs.
-  In most cases you want to run `/bin/ksh` shell.
-* `klog-mask` - Specifies for which [subsystem][4] debug messages will be logged
-  to kernel logging facilities. `KL_DEFAULT_MASK` is used by default.
-* `klog-utest-mask` - As above but applies to execution of userspace tests.
-  `KL_UTEST_MASK` is used by default.
+* `init=PROGRAM` - PID 1のユーザー空間プログラムを指定します。`bin`ディレクトリと
+  `usr.bin`ディレクトリをブラウズして現在利用可能なプログラムを探します。ほとんどの
+  場合、/bin/kshシェルを実行することになるでしょう。
+* `klog-mask` - どの[サブシステム][4]のデバッグメッセージをカーネルのロギング機能で
+  出力するかを指定します。デフォルトは`KL_DEFAULT_MASK`が使用されます。
+* `klog-utest-mask` - 上と同じですがユーザ空間テストの実行に適用されます。
+  デフォルトは`KL_UTEST_MASK`が使用されます。
 
-Please note that `launch` script is highly configurable by means of changing
-`CONFIG` dictionary.
+`launch`スクリプトは`CONFIG`辞書を変更することで高度に設定可能であることに注意して
+ください。
 
-If you want to run tests please read [this document][2].
+テストを実行したい場合は[このドキュメント][2]をお読みください。
 
 [1]: https://github.com/tmux/tmux/wiki
-[2]: sys/tests/README.md
+[2]: tests.md
 [3]: launch
 [4]: include/sys/klog.h

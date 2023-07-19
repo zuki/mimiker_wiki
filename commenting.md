@@ -1,34 +1,29 @@
-# How do we comment our code?
+# どのようにコードをコメントするのか？
 
-- We use [Markdown](https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf)
-  syntax inside C-style comments.
+- Cスタイルのコメントの中に[Markdown](https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf)構文を使用してコメントします。
 
-## Tags
+## タグ
 
-Tags are meant to help us mark important things in our code.
-When you are about to write a comment that requires special
-attention, please add an adequate tag to mark it.
+タグはコードの中で重要なことをマークするためのものです。特別な注意を必要と
+するコメントを書く場合は適切なタグを追加してください。
 
-Wildcards used below:
+次のワイルドカードを使用します。
 
-- `?a`: author's GitHub nick
-- `?s`: name of source from which code has been taken
-- `?t`: term to be described
+- `?a`: 作者のGitHubニックネーム
+- `?s`: コードの引用元のソース名
+- `?t`: 記述する用語
 
-### List of tags
+### タグ一覧
 
-- `FIXME(?a)`: info about needed fixes, that we are aware about,
-   but we leave it be
-- `TODO(?a)`: info about some unimplemented features for
-   the time being, less obliging than GitHub Issue
-- `XXX(?a)`: explanation for some non-obvious part of code,
-   perhaps a hack
-- `START OF ?s CODE` and `END OF ?s CODE`: marks foreign part of code,
-   you **must** leave info about where is it taken from along
-   with specific link
-- `INFO(?t)`: describes given term, must occur exactly once in the code
+- `FIXME(?a)`: 必要な修正についての情報。承知しているがそのままにしているもの
+- `TODO(?a)`: GitHubのIssueにするほどではない、当面は未実装の機能に関する情報
+- `XXX(?a)`: おそらくはハックであるコードの明白でない部分の説明
+- `START OF ?s CODE` と `END OF ?s CODE`: 外部から取り込んだコードの部分を
+  マークする。そのコードをどこから取得したかに関する情報をリンクとともに
+  残す**必要があります**。
+- `INFO(?t)`: 指定された用語の説明。コードの中に書くのは一回だけでなければなりません。
 
-### Tags usage examples
+### タグの使用例
 
 - `FIXME(?a)`
 
@@ -42,7 +37,7 @@ do {
 } while (ret == EEXIST);
 ```
 
-[Full code](https://mimiker.ii.uni.wroc.pl/source/xref/mimiker/sys/drv/evdev.c?r=60656d5d#510)
+[完全なコード](https://github.com/cahirwpz/mimiker/blob/eacc19512e859e5203b8345963b3b71c96dacf53/sys/drv/evdev.c#L614-L621)
 
 - `TODO(?a)`
 
@@ -61,12 +56,12 @@ static void cbus_uart_init(console_t *dev __unused) {
      * infrastructure. It should be changed after done with DEVCLASS. */
     vaddr_t handle = kmem_map_contig(MALTA_FPGA_BASE, PAGESIZE, PMAP_NOCACHE);
     cbus_uart->r_bus_handle = handle + MALTA_CBUS_UART_OFFSET;
-  
+
     set(LCR, LCR_DLAB);
     out(DLM, 0);
     out(DLL, 1); /* 115200 */
     clr(LCR, LCR_DLAB);
-  
+
     out(IER, 0);
     out(FCR, 0);
     out(LCR, LCR_8BITS); /* 8-bit data, no parity */
@@ -108,7 +103,7 @@ if (!pit->noticed_overflow)
 tm_trigger(&pit->timer);
 ```
 
-[Context for the one below](https://mimiker.ii.uni.wroc.pl/source/xref/mimiker/lib/libc/stdio/vfscanf.c?r=10da8877#919)
+[下の例のコンテキスト](https://github.com/cahirwpz/mimiker/blob/eacc19512e859e5203b8345963b3b71c96dacf53/lib/libc/stdio/vfscanf.c#L923-L937)
 
 ```c
 #if 1 /* XXX another disgusting compatibility hack */
@@ -116,7 +111,7 @@ tm_trigger(&pit->timer);
 
 - `START OF ?s CODE` / `END OF ?s CODE`
 
-[Example](https://mimiker.ii.uni.wroc.pl/source/xref/mimiker/sys/kern/tty.c?r=7a5a999c#26)
+[例](https://github.com/cahirwpz/mimiker/blob/eacc19512e859e5203b8345963b3b71c96dacf53/sys/kern/tty.c#L26-L113)
 
 - `INFO(?a)`
 

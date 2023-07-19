@@ -1,97 +1,99 @@
-# Onboarding note
+# オンボーディング・ノート
 
-## Project overview
+## プロジェクトの概要
 
-Mimiker is an experimental implementation of a simple UNIX-like operating
-system for the Malta board and Raspberry Pi 3.
+MimikerはMaltaボードとRaspberry Pi 3用のシンプルなUNIXライクな
+オペレーティングシステムの実験的実装です。
 
-### Main project goals
+### プロジェクトの主な目標
 
-* to be a research system helping us to understand structure of UNIX kernels
-* implement only Kernel of the system on our own.
-* keep User Space interface as compatible as possible with
-  NetBSD. That way we'll be capable to run all programs designed for that
-  system, we already are able to run a few of those. Consequence of that
-  is all user header files are the same as NetBSD's.
-* we want kernel to be run on a modern architecture, we started with MIPS32,
-  but currently we are switching to AArch64 (Raspberry Pi 3)
-* we love to KISS
+* UNIXカーネルの構造を理解するための研究用システムであること
+* システムのカーネルだけを独自に実装すること
+* ユーザ空間インターフェイスを可能な限りNetBSDとの互換性を保つ。
+  そうすることでNetBSD用に設計されたすべてのプログラムを実行できるように
+  なり、すでにそのいくら羽化は実行可能です。その結果、すべてのユーザ
+  ヘッダファイルはNetBSDのものと同じです。
+* カーネルを現代のアーキテクチャで動かしたい。MIPS32で開始しましたたが
+  現在はAArch64 (Raspberry Pi 3) に変更しています。
+* 私達はKISS原則が大好きです。
 
-### More significant tools we use to run system
+### システムの実行に使用する、重要なツール
 
-* QEMU - system emulator allowing us to run MIPS and AArch64 guest code
-  on x86-64 hosts.
-* Tmux - terminal multiplexer, that allows us to access multiple terminals in
-  one window
-* Korn Shell (`ksh`) - simple and only one shell that we already ported
+* QEMU - システムエミュレータ。x86-64ホスト上でMIPSやAArch64のゲストコードを実行できます。
+* Tmux - ターミナルマルチプレクサ。1つの画面から複数のターミナルにアクセスできます。
+* Korn Shell (ksh) - すでに移植済みのシンプルで唯一のシェルです。
 
-#### How system is run?
+#### システムはどのように実行されるのか？
 
-When you turn on the system with `./launch` [script][1] system is being run in QEMU.
-Multiple terminals are connected to VM. Between these you can switch with Tmux.
-One of them is klog (log with kernel messages), the second one is GDB.
-The other one there can be Korn Shell working in the system.
+`./launch` [スクリプト][1]でシステムを起動するとシステムはQEMUで実行されます。
+複数の端末がVMに接続されます。これらの端末はTmuxで切り替えることができます。
+1つの端末はklog（カーネルメッセージのログ）でもう1つの端末はGDBです。さらに
+システムで動作するKorn Shellの
 
-### Project file hierarchy
+### プロジェクトのファイル階層
 
-Most of the incoherence in file hierarchy come from expectations of C
-programs to find header files in specific locations.
-More information can be found in [`hier(7)`][2].
+ファイル階層が支離滅裂である理由のほとんどは、Cプログラムが特定の場所に
+ヘッダファイルがあることを期待していることに起因します。より詳しい情報は
+[`hier(7)`][2]にあります。
 
-* `bin/` and `usr.bin/` programs from NetBSD that are
-  considered to be ready to run, because are build during compilation
-  * `bin/utest/` tests, that are supposed to be run in User Space,
-    testing mostly syscalls
-* `contrib/` programs we are capable to build without significant modifications.
-  Modifications, if any, are applied as patches
-* `build/` build scripts, shared by all Makefiles
-* `etc/` system configuration files and scripts
-* `include/` folder with all the header files for code ran in User and Kernel
-  Space. That one has most of the incoherences, because
-  everything here is compatible with NetBSD and the standard C library.
-  * `include/dev/` description of hardware registers and struct definitions.
-  Vast majority of contained files has been acquired from existing systems.
-  Everything that concerns drivers are located here.
-  * `include/mips/` and `/include/aarch64` parts depending on architecture,
-    partly acquired, available for Kernel
-  * `include/sys/` headers mostly for Kernel, but with parts dedicated for
-    User Space
-* `lib/` User Space libraries ported from NetBSD, but only these we actually need
-  * `lib/csu/` files `crt0` ("C runtime 0") describing program life before
-  `main` function and after calling `return` at the end
-  * `lib/libc/` C library files, parts that depend on architecture are written
-    in Assembly
-* `sys/` actual Kernel code
-  * `sys/kern/` main part of Kernel
-  * `sys/debug` Python scripts extending GDB capabilities.
-  * `sys/drv` system drivers for hardware devices
-  * `sys/script` scripts generating glue code, i.e. syscalls
-  * `sys/tests` tests ran in Kernel Space
-  * `sys/aarch64/` and `sys/mips/` hardware dependent parts
-* `toolchain/` tools for development environment
-  * `toolchain/gnu/` mimiker compiler toolchain containing
-    cross-compiler for building mimiker on your desktop.
-    It comes in two versions for both supported platforms
-  * `toolchain/qemu-mimiker/` debian install scripts and patches for QEMU -
-    machine emulator and simulator for running mimiker
-  * `toolchain/openocd-mimiker` port of OpenOCD -
-    Interface for hardware debugger. Adapter between Raspberry Pi 3 board and GDB
-* `Dockerfile` description of environment for GitHub Actions build and testing
-* `.github/workflows/` YAML scripts for Continuous integration
-  * `.github/workflows/default.yml` CI script that builds system and
-    tests it in cloud. Run every time new commit it pushed on any branch.
-  * `.github/workflows/deploy_wiki.yml` GitHub Actions script that runs
-    script from `wiki/` every time new wiki document file lands on Master
-* `wiki/` contains documents of our wiki and script
-  that publishes files from `wiki/docs` to GitHub Wiki
+* `bin/` と `usr.bin/` にあるNetBSDのプログラムはコンパイル時にビルド
+  されるので実行可能であると考えられます。
+  * `bin/utest/` はユーザ空間で実行されることを想定したテストです。主に
+    システムコールをテストします。
+* `contrib/` 大きな変更なしにビルド可能なプログラムです。変更が必要な場合は
+  パッチが適用されます。
+* `build/` すべてのMakefileで共有されるビルドスクリプトです。
+* `etc/` システム構成ファイルとスクリプトです。
+* `include/` ユーザ空間とカーネル空間で実行されるコード用のすべてのヘッダ
+  ファイルを含むフォルダです。ここにあるすべてのファイルはNetBSDと標準C
+  ライブラリと互換性があるため、ありとあらゆる矛盾が存在しています。
+  * `include/dev/` ハードウェアレジスタの記述と構造体定義です。ここに
+  ほとんどすべてのファイルは既存のシステムから収集したものです。ドライバに
+  関する全てはここにあります。
+  * `include/mips/` と `/include/aarch64` はカーネルが利用する（一部収集した）
+    アーキテクチャ固有のファイルです。
+  * `include/sys/` 殆どはカーネル用のヘッダですが、一部はユーザ空間用のものも
+    あります。
+* `lib/` NetBSDから移植したユーザ空間ライブラリです。実際に必要なものは次の
+  ものだけです。
+  * `lib/csu/` は`main`関数の前と最後に`return`を呼び出した後に存在する
+    プログラムを記述している`crt0` ("C runtime 0") を収めています。
+  * `lib/libc/` Cのライブラリファイルです。アーキテクチャ固有の部分は
+    アセンブリで書かれています。
+* `sys/` 実際のカーネルコードです
+  * `sys/kern/` カーネルのメインパートです
+  * `sys/debug` GDBの互換性を高めるPythonスクリプトです
+  * `sys/drv` ハードウエアデバイス用のシステムドライバです
+  * `sys/script` グルーコード（syscallなど）を生成するスクリプトです
+  * `sys/tests` カーネル空間で実行されるテストです
+  * `sys/aarch64/` と `sys/mips/` はハードウェア固有のコードです
+* `toolchain/` 開発環境用のツールです
+  * `toolchain/gnu/` mimikerを手元の環境でクロスコンパイルするための
+    mimikerコンパイルツールチェーンです。プラットフォームをサポートする
+    2つのバージョンがあります
+  * `toolchain/qemu-mimiker/` QEMUのインストールとパッチ適用をするための
+    debianスクリプトです。QEMUはmimikerを実行するためのマシンエミュレータ・
+    シミュレータです
+  * `toolchain/openocd-mimiker` OpenOCDのポートです - OpenOCDはハードウェア
+    デバッガのためのインタフェースです。Raspberry Pi 3ボードとGDBをつなぐ
+    アダプタです
+* `Dockerfile` GitHub Actionsビルドとテスト用の環境の記述です
+* `.github/workflows/` 継続的インテグレーション用のYAMLスクリプトです
+  * `.github/workflows/default.yml` クラウド上でシステムをビルドし、テスト
+    するためのCIスクリプトです。新しいコミットがいずれかのブランチに追加
+    されるたびに実行します
+  * `.github/workflows/deploy_wiki.yml` 新しいwikiドキュメントファイルが
+    Masterブランチに追加されるたびに`wiki/`からスクリプトを実行する
+    GitHub Actionsスクリプトです。
+* `wiki/` wikiのドキュメントと、`wiki/docs`のファイルをGitHub Wikiに公開
+  するスクリプトが含まれています
 
-### Licence
+### ライセンス
 
-This project is licensed under the BSD 3-Clause. Details of code we can
-use can be found [here][3] and [that][4] is a nice cheat sheet.
-The Simplest inferences include facts that we can use all the code under MIT
-licence and we are not supposed to look at or be inspired by any code
-under GPL.
+このプロジェクトはBSD 3-Clauseでライセンスされています。私たちが使用できる
+コードの詳細は[ここ][3] で見ることができます。[これ][4]は素晴らしいチート
+シートです。最も単純な推論には、MITライセンスのコードはすべて使うことができ。
+GPLのコードは見たり触発されたりはしてはいけないという事実が含まれます。
 
 [1]: https://github.com/cahirwpz/mimiker#readme
 [2]: https://man.netbsd.org/hier.7

@@ -1,0 +1,14 @@
+[book]
+authors = ["Keiji Suzuki"]
+language = "ja"
+multilingual = false
+src = "."
+title = "Mimiker Wiki"
+
+[output.html]
+default-theme = "rust"
+git-repository-url = "https://github.com/cahirwpz/mimiker.wiki.git"
+
+[output.html.fold]
+enable = false
+level = 0

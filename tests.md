@@ -1,77 +1,78 @@
-# Test infrastructure
+# テスト基盤
 
-## Running tests
+## テスtの実行
 
-If you just want to run all available tests please use `./run_tests.py`. This is
-the command that is used by continuous integration. Some useful arguments are
-listed below:
+利用可能なテストをすべて実行したい場合は`./run_tests.py`を使ってください。
+これは継続的インテグレーションで使用されるコマンドです。便利な引数を以下に
+示します：
 
-* `--infinite` - keep testing until some error is found.
-* `--non-interactive` - do not run interactive GDB session if tests fail.
-* `--thorough` - generate much more test seeds. Testing will take much more time.
+* `--infinite` - エラーが見つかるまでテストを続けます。
+* `--non-interactive` - テストが失敗した場合、インタラクティブなGDBセッションを
+  実行しません。
+* `--thorough` - より多くのテストシードを生成します。テストにはより多くの時間が
+  かかります。
 
-For greater control you can pass kernel arguments that control test runs. That
-includes passing `seed` which is used to generate tests permutation, which
-proved to be useful. Some useful kernel parameters for test run control are
-listed below:
+より細かく制御するためにテストの実行を制御するカーネル引数を渡すことができます。
+これには有用性が証明されているテストの並べ替えを生成するために使用される`seed`を
+渡すことも含まれます。テストの実行を制御するための便利なカーネル引数を以下に
+示します。
 
-* `test=TEST` - Requests the kernel to run the specified test.
-  `test=user_{name}` to run single user test, `test={name}` to run single kernel
-  test.
-  You can specify multiple tests by separating their names with commas (without spaces),
-  e.g. `test=test1,test2,test3`
-* `test=all` - Runs a number of tests one after another, and reports success
-  only when all of them passed.
-* `seed=UINT` - Sets the RNG seed for shuffling the list of test when using
-  `test=all`.
-* `repeat=UINT` - Specifies the number of (shuffled) repetitions of each test
-  when using `test=all`.
-  When running user-specified tests (i.e. when `test` is not equal to `all`),
-  `repeat` specifies the number of times each test will be run. For example,
-  `test=test1,test2 repeat=4` will run `test1` 4 times and then run `test2` 4 times.
 
-## Tests implementation
+* `test=TEST` - 指定のテストを実行するようカーネルに要求します。
+  `test=user_{name}`は単一のユーザーテストの実行を、`test={name}`は単一の
+  カーネルテストの実行を要求します。
+  `test=test1,test2,test3`のようにカンマ区切りで（スペースを入れずに）複数の
+  テストを指定できます。
+* `test=all` - 複数のテストを次々に実行し、すべてが合格した場合にのみ成功を
+  報告します。
+* `seed=UINT` - `test=all`を使用する際にテストのリストをシャッフルするための
+  RNGシードを設定します。
+* `repeat=UINT` - `test=all`を使用する際に各テストの（シャッフルされた）
+  繰り返し回数を指定します。ユーザー指定のテストを実行する場合（すなわち、
+  `test`が`all`でない場合）、`repeat`は各テストの実行回数を指定します。
+  たとえば、`test=test1,test2 repeat=4`は`test1`を4回実行した後、`test2``を
+  4回実行します。
 
-### Kernel tests
+## テストの実装
 
-Located in `/sys/tests`.
-Test function signature looks like this: `{name}(void)` or sometimes
-`{name}(unsigned int)` but needs to be coerced to `(int (*)(void))`.
+### カーネルテスト
 
-Macros to register tests:
+`/sys/tests`にあります。
+テスト関数のシグネチャは`{name}(void)`です。たまに`{name}(unsigned int)`の
+場合もありますが、`(int (*)(void))`に強制する必要があります。
+
+テストを登録する次のマクロがあります。
 
 * `KTEST_ADD(name, func, flags)`
-* `KTEST_ADD_RANDINT(name, func, flags, max)` - need to cast function pointer to
-  `(int (*)(void))`
+* `KTEST_ADD_RANDINT(name, func, flags, max)` - 関数ポインタを`(int (*)(void))`に
+  キャストする必要があります。
 
-Where `name` is test name, `func` is pointer to test function,
-flags as mentioned below, and `max` is maximum random argument fed to the test.
+ここで`name`はテスト名、`func`はテスト関数へのポインタ、`flags`は後述の通り、
+`max`はテストに提要される最大のランダム引数です。
 
-### User tests
+### ユーザテスト
 
-Located in `/bin/utest`.
-User-space test function signature looks like this: `int test_{name}(void)` and
-should be defined in `/bin/utest/utest.h`.
-In order to make the test runnable one has to add one of these lines to
-`/sys/tests/utest.c` file:
+`/bin/utest`にあります。
+ユーザ空間のテスト関数のシグネチャは`int test_{name}(void)`であり、
+`/bin/utest/utest.h`で定義されている必要があります。
+テストを実行可能にするためには次の行のいずれかを`/sys/tests/utest.c`に
+追加する必要があります。
 
-* `UTEST_ADD_SIMPLE({name})` - test fails on assertion or non-zero return value.
-* `UTEST_ADD_SIGNAL({name}, {SIGNUMBER})` - test passes when terminated with
-  `{SIGNUMBER}`.
-* `UTEST_ADD({name}, {exit status}, flags)` - test passes when exited with
-  status `{exit status}`.
+* `UTEST_ADD_SIMPLE({name})` - アサーションまたはゼロ以外の返り値でテストが失敗します。
+* `UTEST_ADD_SIGNAL({name}, {SIGNUMBER})` - `{SIGNUMBER}`で終了するとテストはパスします。
+* `UTEST_ADD({name}, {exit status}, flags)` - ステータス`{exit status}`で終了するとテストにパスします。
 
-One also needs to add a line
+また、次の行を追加する必要があります。
 
-* `CHECKRUN_TEST({name})` in `/bin/utest/main.c`,
-* `int test_{name}(void);` in `/bin/utest/utest.h`,
-* `${filename}.c` in `bin/utest/Makefile`.
+*  `/bin/utest/main.c`に`CHECKRUN_TEST({name})`,
+*  `/bin/utest/utest.h`に`int test_{name}(void);`
+*  `bin/utest/Makefile`に`${filename}.c`
 
-### Creating tests
+### テストの作成
 
-Tests are supposed to return `0` or create kernel panic during execution,
-that can be achieved by the usage of `assert`. That implies that the test
-shouldn't look like the code bellow
+テストは0を返すか、実行中にカーネルパニックを起こすものですが、これは`assert`を
+使うことで実現できます。つまり、テストは以下のようなコードではいけないと
+いうことです。
 
 ```c
 pid_t child_pid;
@@ -81,17 +82,17 @@ case -1: /* error */
     perror("fork");
     exit(EXIT_FAILURE);
 
-case 0:               
+case 0:
     /* child */
     ...
 
-default:               
+default:
     /* parent */
     ...
 }
 ```
 
-but more like this one
+次のようにします。
 
 ```c
 pid_t child_pid = fork();
@@ -104,11 +105,10 @@ if (child_pid == 0) {
 ...
 ```
 
-The same goes with usage of every function that may not execute successfully.
+正常に実行されない可能性のあるあらゆる関数の使用についても同様です。
 
-Also watch out for `assert`, *it's a macro* which means that expression
-inside may be executed more than once. Hence, version of `fork` below is
-absolutely **unacceptable**.
+また、`assert`も要注意です。*assertはマクロ*なので中の式が複数回実行される
+可能性があります。そのため、以下の`fork`バージョンは絶対に**許されません**。
 
 ```c
 pid_t child_pid;
@@ -121,15 +121,15 @@ if (child_pid == 0) {
 ...
 ```
 
-### Flags
+### フラグ
 
-* `KTEST_FLAG_NORETURN` - signifies that a test does not return.
-* `KTEST_FLAG_DIRTY` - signifies that a test irreversibly breaks internal kernel
-  state, and any further test done without restarting the kernel will be
-  inconclusive.
-* `KTEST_FLAG_USERMODE` - indicates that a test enters user mode.
-* `KTEST_FLAG_BROKEN` - excludes the test from being run in auto mode. This flag
-  is only useful for temporarily marking some tests while debugging the testing
-  framework.
-* `KTEST_FLAG_RANDINT` - marks that the test wishes to receive a random integer
-  as an argument.
+* `KTEST_FLAG_NORETURN` - テストは復帰しないことを意味します。
+* `KTEST_FLAG_DIRTY` - テストがカーネル内部の状態を不可逆的に破壊し、
+  カーネルを再起動することなくそれ以降のテストを実施しても結論は出ない
+  ことを意味します。
+* `KTEST_FLAG_USERMODE` - テストがユーザモードに入ることを示します。
+* `KTEST_FLAG_BROKEN` - 自動モードでのテストの実行を除外します。このフラグは
+  テストフレームワークのデバッグ中に一時的にテストをマークする場合にのみ
+  有用です。
+* `KTEST_FLAG_RANDINT` - テストがランダムな整数を引数として受け取りたい
+  ことを示します。
