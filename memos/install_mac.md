@@ -266,3 +266,54 @@ Error
 
 - Mac版のcpioは`-format=crc`オプションを処理できない
 - brewでcpioをインストール
+
+# 実行
+
+```diff
+$ git diff launch
+diff --git a/launch b/launch
+index 6c5dc406..8eb56f6c 100755
+--- a/launch
++++ b/launch
+@@ -122,7 +122,7 @@ CONFIG = {
+                 'drive': 'if=none,id=stick,file={path}',
+             },
+             'rpi3': {
+-                'binary': 'qemu-mimiker-aarch64',
++                'binary': 'qemu-system-aarch64',
+                 'options': [
+                     '-machine', 'raspi3b',
+                     '-smp', '4',
+$ ./launch
+```
+
+![mimiker画面](mimiker_mac.png)
+
+# テスト
+
+```diff
+@@ -183,7 +183,7 @@ CONFIG = {
+                 'binary': 'mipsel-mimiker-elf-gdb'
+             },
+             'rpi3': {
+-                'binary': 'aarch64-mimiker-elf-gdb'
++                'binary': 'gdb'
+             },
+             'litex-riscv': {
+                 'binary': 'riscv32-mimiker-elf-gdb'
+```
+
+```bash
+$ ./run_tests.py
+Testing seed 3503813989...
+Testing seed 2026567757...
+Testing seed 2231057406...
+Testing seed 1978833144...
+Testing seed 2952461665...
+Testing seed 2946466955...
+Testing seed 1802233673...
+Testing seed 3623825760...
+Testing seed 1593244991...
+Testing seed 606866587...
+Tests successful!
+```
