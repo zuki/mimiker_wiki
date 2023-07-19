@@ -18,4 +18,5 @@
 
 # 作業メモ
 
-- [インストール](memos/install.md)
+- [Macでのインストール](memos/install_mac.md)
+- [Ubuntuでのインストール](memos/install_ubuntu.md)
