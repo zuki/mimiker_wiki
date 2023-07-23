@@ -25,6 +25,6 @@
 実行することを推奨します。
 
 **重要** Mimkerを別のボード用にビルドする場合は、その前に以前のボードを
-`BOARDP引数にセットして`make distclean`を実行必要があります。
+`BOARDP`引数にセットして`make distclean`を実行必要があります。
 
 [1]: toolchain.md
