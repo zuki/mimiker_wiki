@@ -107,7 +107,7 @@ Mimikerは次の機能をサポートしてます。
 [13]: https://wiki.freebsd.org/FlattenedDeviceTree
 [14]: https://nostarch.com/download/samples/freebsd-device-drivers_ch7.pdf
 [15]: https://www.qemu.org/docs/master/system/target-mips.html
-[16]: https://en.wikipedia.org/wiki/Pseudoterminal
+[16]: https://ja.wikipedia.org/wiki/%E6%93%AC%E4%BC%BC%E7%AB%AF%E6%9C%AB
 [17]: https://man.netbsd.org/script.1
 [18]: https://man.netbsd.org/ksh.1
 [19]: https://clang.llvm.org/
